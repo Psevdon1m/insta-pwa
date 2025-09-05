@@ -38,6 +38,7 @@ function createCard() {
     cardTitle.className = "mdl-card__title";
     cardTitle.style.backgroundImage = 'url("/src/images/sf-boat.jpg")';
     cardTitle.style.backgroundSize = "cover";
+    cardTitle.style.color = "white";
     cardTitle.style.height = "180px";
     cardWrapper.appendChild(cardTitle);
     var cardTitleTextElement = document.createElement("h2");
