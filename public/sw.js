@@ -1,5 +1,5 @@
-var CACHE_STATIC_NAME = "static-v2";
-var CACHE_DYNAMIC_NAME = "dynamic-v1";
+var CACHE_STATIC_NAME = "static-v1112";
+var CACHE_DYNAMIC_NAME = "dynamic-v11";
 self.addEventListener("install", (event) => {
     console.log("[Service Worker] Installing Service Worker... ", event);
     event.waitUntil(
@@ -29,25 +29,99 @@ self.addEventListener("activate", (event) => {
     return self.clients.claim();
 });
 
+// self.addEventListener("fetch", (e) => {
+//     e.respondWith(
+//         caches.match(e.request).then((res) => {
+//             if (res) {
+//                 return res;
+//             } else {
+//                 return fetch(e.request)
+//                     .then((res) => {
+//                         return caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
+//                             cache.put(e.request.url, res.clone()); //res can be consumed once, therefore return will be empty, so we need to call clone method
+//                             return res;
+//                         });
+//                     })
+//                     .catch((e) => {
+//                         return caches.open(CACHE_STATIC_NAME).then((cache) => {
+//                             //should be fine-tuned for api request.
+//                             return cache.match("/offline.html");
+//                         });
+//                     });
+//             }
+//         })
+//     );
+// });
+
+/**                           */
+/**                           */
+/**   STRATEGIES EDGE CASES   */
+/**                           */
+/**                           */
+
+//cache only strategy
+// self.addEventListener("fetch", (e) => {
+//     e.respondWith(caches.match(e.request));
+// });
+
+//network only strategy
+// self.addEventListener("fetch", (e) => {
+//     e.respondWith(fetch(e.request));
+// });
+
+//network with cache fallback
+// self.addEventListener("fetch", (e) => {
+//     e.respondWith(
+//         fetch(e.request).catch((e) => {
+//             console.log({ e });
+
+//             return caches.match(e.request);
+//         })
+//     );
+// });
+/* ------------------------------------------ */
+
+/**                           */
+/**                           */
+/**   STRATEGIES USED WIDELY  */
+/**                           */
+/**                           */
+
+// Cache, then network
+
 self.addEventListener("fetch", (e) => {
-    e.respondWith(
-        caches.match(e.request).then((res) => {
-            if (res) {
-                return res;
-            } else {
-                return fetch(e.request)
-                    .then((res) => {
-                        return caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
-                            cache.put(e.request.url, res.clone()); //res can be consumed once, therefore return will be empty, so we need to call clone method
-                            return res;
+    var url = "https://rickandmortyapi.com/api";
+
+    if (e.request.url.indexOf(url) > -1) {
+        e.respondWith(
+            caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
+                return fetch(e.request).then((res) => {
+                    cache.put(e.request, res.clone());
+                    return res;
+                });
+            })
+        );
+    } else {
+        e.respondWith(
+            caches.match(e.request).then((res) => {
+                if (res) {
+                    return res;
+                } else {
+                    return fetch(e.request)
+                        .then((res) => {
+                            return caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
+                                cache.put(e.request.url, res.clone()); //res can be consumed once, therefore return will be empty, so we need to call clone method
+                                return res;
+                            });
+                        })
+                        .catch((e) => {
+                            return caches.open(CACHE_STATIC_NAME).then((cache) => {
+                                //should be fine-tuned for api request.
+                                return cache.match("/offline.html");
+                            });
                         });
-                    })
-                    .catch((e) => {
-                        return caches.open(CACHE_STATIC_NAME).then((cache) => {
-                            return cache.match("/offline.html");
-                        });
-                    });
-            }
-        })
-    );
+                }
+            })
+        );
+    }
 });
