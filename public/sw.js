@@ -1,5 +1,6 @@
-var CACHE_STATIC_NAME = "static-v1112";
+var CACHE_STATIC_NAME = "static-v11121";
 var CACHE_DYNAMIC_NAME = "dynamic-v11";
+var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src/js/feed.js", "/src/js/material.min.js", "/src/css/app.css", "/src/css/feed.css", "/src/images/main-image.jpg", "https://fonts.googleapis.com/icon?family=Material+Icons", "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css", "https://fonts.googleapis.com/css?family=Roboto:400,700"];
 self.addEventListener("install", (event) => {
     console.log("[Service Worker] Installing Service Worker... ", event);
     event.waitUntil(
@@ -7,7 +8,7 @@ self.addEventListener("install", (event) => {
         caches.open(CACHE_STATIC_NAME).then(function (cache) {
             //update static version on new releases
             console.log("[Service Worker] Precaching App Shell");
-            cache.addAll(["/", "/index.html", "/offline.html", "/src/js/app.js", "/src/js/feed.js", "/src/js/material.min.js", "/src/css/app.css", "/src/css/feed.css", "/src/images/main-image.jpg", "https://fonts.googleapis.com/icon?family=Material+Icons", "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css", "https://fonts.googleapis.com/css?family=Roboto:400,700"]);
+            cache.addAll(STATIC_FILES);
         })
     );
 });
@@ -28,6 +29,13 @@ self.addEventListener("activate", (event) => {
     );
     return self.clients.claim();
 });
+
+function isInArray(string, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] === string) return true;
+    }
+    return false;
+}
 
 // self.addEventListener("fetch", (e) => {
 //     e.respondWith(
@@ -91,8 +99,10 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (e) => {
     var url = "https://rickandmortyapi.com/api";
+    var staticAssets = [];
 
     if (e.request.url.indexOf(url) > -1) {
+        //cache then network
         e.respondWith(
             caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
                 return fetch(e.request).then((res) => {
@@ -101,7 +111,10 @@ self.addEventListener("fetch", (e) => {
                 });
             })
         );
+    } else if (isInArray(e.request.url, STATIC_FILES)) {
+        e.respondWith(caches.match(e.request));
     } else {
+        //cache with network fallback
         e.respondWith(
             caches.match(e.request).then((res) => {
                 if (res) {
@@ -114,10 +127,13 @@ self.addEventListener("fetch", (e) => {
                                 return res;
                             });
                         })
-                        .catch((e) => {
+                        .catch((error) => {
                             return caches.open(CACHE_STATIC_NAME).then((cache) => {
-                                //should be fine-tuned for api request.
-                                return cache.match("/offline.html");
+                                //for fallback no cached pages
+                                if (e.request.headers.get("accept").includes("text/html")) {
+                                    return cache.match("/offline.html");
+                                }
+                                //else can return images as well depends on headers
                             });
                         });
                 }
