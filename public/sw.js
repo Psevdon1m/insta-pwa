@@ -1,6 +1,8 @@
-var CACHE_STATIC_NAME = "static-v1";
+importScripts("/src/js/idb.js");
+
+var CACHE_STATIC_NAME = "static-v2";
 var CACHE_DYNAMIC_NAME = "dynamic-v11";
-var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src/js/feed.js", "/src/js/material.min.js", "/src/css/app.css", "/src/css/feed.css", "/src/images/main-image.jpg", "https://fonts.googleapis.com/icon?family=Material+Icons", "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css", "https://fonts.googleapis.com/css?family=Roboto:400,700"];
+var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src/js/idb.js", "/src/js/feed.js", "/src/js/material.min.js", "/src/css/app.css", "/src/css/feed.css", "/src/images/main-image.jpg", "https://fonts.googleapis.com/icon?family=Material+Icons", "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css", "https://fonts.googleapis.com/css?family=Roboto:400,700"];
 
 // function trimCache(cacheName, maxItems) {
 //     caches.open(cacheName).then((cache) => {
@@ -12,6 +14,12 @@ var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src
 //         });
 //     });
 // }
+
+var dbPromise = idb.open("posts-store", 1, (db) => {
+    if (!db.objectStoreNames.contains("posts")) {
+        db.createObjectStore("posts", { keyPath: "id" });
+    }
+});
 self.addEventListener("install", (event) => {
     console.log("[Service Worker] Installing Service Worker... ", event);
     event.waitUntil(
@@ -114,12 +122,23 @@ self.addEventListener("fetch", (e) => {
     if (e.request.url.indexOf(url) > -1) {
         //cache then network
         e.respondWith(
-            caches.open(CACHE_DYNAMIC_NAME).then((cache) => {
-                return fetch(e.request).then((res) => {
-                    // trimCache(CACHE_DYNAMIC_NAME, 25);
-                    cache.put(e.request, res.clone());
-                    return res;
+            fetch(e.request).then((res) => {
+                let clonedRes = res.clone();
+                clonedRes.json().then((data) => {
+                    for (let key in data) {
+                        dbPromise.then((db) => {
+                            //begin tx for store and choose operation
+                            let tx = db.transaction("posts", "readwrite");
+                            // get store from tx
+                            let store = tx.objectStore("posts");
+                            //put data in store
+                            store.put(data[key]);
+                            //complete tx, yes it is NOT a method
+                            return tx.complete;
+                        });
+                    }
                 });
+                return res;
             })
         );
     } else if (isInArray(e.request.url, STATIC_FILES)) {
