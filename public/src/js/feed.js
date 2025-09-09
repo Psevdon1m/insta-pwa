@@ -56,24 +56,24 @@ function clearCards() {
     }
 }
 
-function createCard() {
+function createCard(data) {
     var cardWrapper = document.createElement("div");
     cardWrapper.className = "shared-moment-card mdl-card mdl-shadow--2dp";
     cardWrapper.style.margin = "0 auto";
     var cardTitle = document.createElement("div");
     cardTitle.className = "mdl-card__title";
-    cardTitle.style.backgroundImage = 'url("/src/images/sf-boat.jpg")';
+    cardTitle.style.backgroundImage = `url(${data.image})`;
     cardTitle.style.backgroundSize = "cover";
     cardTitle.style.color = "white";
     cardTitle.style.height = "180px";
     cardWrapper.appendChild(cardTitle);
     var cardTitleTextElement = document.createElement("h2");
     cardTitleTextElement.className = "mdl-card__title-text";
-    cardTitleTextElement.textContent = "San Francisco Trip";
+    cardTitleTextElement.textContent = data.location;
     cardTitle.appendChild(cardTitleTextElement);
     var cardSupportingText = document.createElement("div");
     cardSupportingText.className = "mdl-card__supporting-text";
-    cardSupportingText.textContent = "In San Francisco";
+    cardSupportingText.textContent = data.title;
     cardSupportingText.style.textAlign = "center";
     // var cardSaveButton = document.createElement("button");
     // cardSaveButton.textContent = "Save";
@@ -84,8 +84,14 @@ function createCard() {
     sharedMomentsArea.appendChild(cardWrapper);
 }
 
-var url = "https://rickandmortyapi.com/api";
+var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
 var networkDataReceived = false;
+
+function updateUI(data) {
+    for (const post of data) {
+        createCard(post);
+    }
+}
 
 fetch(url)
     .then(function (res) {
@@ -95,7 +101,7 @@ fetch(url)
         networkDataReceived = true;
         console.log("FROM WEB: ", data);
         clearCards();
-        createCard();
+        updateUI(Object.values(data));
     });
 
 if ("caches" in window) {
@@ -110,7 +116,7 @@ if ("caches" in window) {
             console.log("FROM CACHE: ", data);
             if (!networkDataReceived) {
                 clearCards();
-                createCard();
+                updateUI(Object.values(data));
             }
         });
 }

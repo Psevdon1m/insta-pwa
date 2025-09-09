@@ -109,7 +109,7 @@ function isInArray(string, array) {
 // Cache, then network
 
 self.addEventListener("fetch", (e) => {
-    var url = "https://rickandmortyapi.com/api";
+    var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
 
     if (e.request.url.indexOf(url) > -1) {
         //cache then network
