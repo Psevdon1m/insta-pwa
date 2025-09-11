@@ -163,3 +163,53 @@ self.addEventListener("fetch", (e) => {
         );
     }
 });
+
+const performSyncing = async () => {
+    console.log("[Service Worker] Checking user status");
+    const online = self.navigator.onLine && (await isActuallyOnline());
+    if (!online) {
+        console.log(" user is offline");
+
+        await self.registration.sync.register("sync-new-posts");
+
+        console.log("successfully re-registered service worker");
+
+        return;
+    }
+    readAllData("sync").then((data) => {
+        for (let d of data) {
+            fetch("https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    title: d.title,
+                    location: d.location,
+                    id: d.id,
+                    image: d.image,
+                }),
+            })
+                .then((res) => {
+                    console.log("Data sent: ", res);
+                    if (res.ok) {
+                        deleteItemFromDB("sync", d.id);
+                    }
+                })
+                .catch((err) => {
+                    console.log("err while sending data: ", err);
+                });
+        }
+    });
+};
+
+self.addEventListener("sync", async (e) => {
+    console.log("[Service Worker] Background syncing", e);
+
+    if (e.tag === "sync-new-posts") {
+        console.log("[Service Worker] Syncing new post");
+
+        e.waitUntil(await performSyncing());
+    }
+});

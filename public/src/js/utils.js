@@ -2,6 +2,9 @@ var dbPromise = idb.open("posts-store", 1, (db) => {
     if (!db.objectStoreNames.contains("posts")) {
         db.createObjectStore("posts", { keyPath: "id" });
     }
+    if (!db.objectStoreNames.contains("sync")) {
+        db.createObjectStore("sync", { keyPath: "id" });
+    }
 });
 
 function writeData(store, data) {
@@ -44,4 +47,37 @@ function deleteItemFromDB(store, id) {
         .then(() => {
             console.log("item deleted");
         });
+}
+
+async function fetchWithTimeout(resource, options = {}) {
+    const { timeout = 5000 } = options; // default 1s
+
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        const response = await fetch(resource, {
+            ...options,
+            signal: controller.signal,
+        });
+        return response;
+    } finally {
+        clearTimeout(id);
+    }
+}
+
+async function isActuallyOnline() {
+    try {
+        // Hit your API (could be a lightweight "ping" endpoint)
+        const res = await fetchWithTimeout("https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json", {
+            method: "GET",
+            cache: "no-store",
+        });
+        return res.ok;
+    } catch (err) {
+        if (err.name === "AbortError") {
+            console.log("Request timed out!");
+        }
+        return false;
+    }
 }

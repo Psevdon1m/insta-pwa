@@ -2,6 +2,9 @@ var shareImageButton = document.querySelector("#share-image-button");
 var createPostArea = document.querySelector("#create-post");
 var closeCreatePostModalButton = document.querySelector("#close-create-post-modal-btn");
 var sharedMomentsArea = document.querySelector("#shared-moments");
+var from = document.querySelector("form");
+var titleInput = document.querySelector("#title");
+var locationInput = document.querySelector("#location");
 
 function openCreatePostModal() {
     createPostArea.style.display = "block";
@@ -112,3 +115,72 @@ if ("indexedDB" in window) {
         }
     });
 }
+
+function sendData() {
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: JSON.stringify({
+            title: titleInput.value,
+            location: locationInput.value,
+            id: new Date().toISOString(),
+            image: "https://www.ukrainer.net/wp-content/uploads/2019/12/15.jpg",
+        }),
+    }).then((res) => {
+        console.log("Data sent: ", res);
+        updateUI();
+    });
+}
+
+from.addEventListener("submit", (e) => {
+    e.preventDefault();
+    console.log("click submit");
+    if (titleInput.value.trim() === "" || locationInput.value.trim() === "") {
+        alert("Please enter valid data");
+        return;
+    }
+
+    closeCreatePostModal();
+    //registering sync request
+    if ("serviceWorker" in navigator && "SyncManager" in window) {
+        navigator.serviceWorker.ready.then(async (sw) => {
+            let post = {
+                title: titleInput.value,
+                location: locationInput.value,
+                id: new Date().toISOString(),
+            };
+
+            //in brawe and other browsers bg sync is disabled by default, so we need to check and inform user
+            let isSyncAllowed;
+            try {
+                await sw.sync.register("test-sync");
+                isSyncAllowed = true;
+            } catch (error) {
+                isSyncAllowed = false;
+            }
+            console.log({ isSyncAllowed });
+            if (isSyncAllowed) {
+                // store data for sync in idb
+                writeData("sync", post)
+                    .then(() => {
+                        return sw.sync.register("sync-new-posts");
+                    })
+                    .then(() => {
+                        let snackBarContainer = document.querySelector("#confirmation-toast");
+                        let data = { message: "Your ppost is saved for syncing!" };
+                        snackBarContainer.MaterialSnackbar.showSnackbar(data);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } else {
+                alert("syncing is disabled by the browser, please allow it in settings");
+            }
+        });
+    } else {
+        sendData();
+    }
+});
