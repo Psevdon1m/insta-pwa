@@ -104,19 +104,11 @@ fetch(url)
         updateUI(Object.values(data));
     });
 
-if ("caches" in window) {
-    caches
-        .match(url)
-        .then((res) => {
-            if (res) {
-                return res.json();
-            }
-        })
-        .then((data) => {
-            console.log("FROM CACHE: ", data);
-            if (!networkDataReceived) {
-                clearCards();
-                updateUI(Object.values(data));
-            }
-        });
+if ("indexedDB" in window) {
+    readAllData("posts").then((data) => {
+        if (!networkDataReceived) {
+            console.log("From db", data);
+            updateUI(data);
+        }
+    });
 }

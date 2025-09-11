@@ -1,4 +1,5 @@
 importScripts("/src/js/idb.js");
+importScripts("/src/js/utils.js");
 
 var CACHE_STATIC_NAME = "static-v2";
 var CACHE_DYNAMIC_NAME = "dynamic-v11";
@@ -15,11 +16,6 @@ var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src
 //     });
 // }
 
-var dbPromise = idb.open("posts-store", 1, (db) => {
-    if (!db.objectStoreNames.contains("posts")) {
-        db.createObjectStore("posts", { keyPath: "id" });
-    }
-});
 self.addEventListener("install", (event) => {
     console.log("[Service Worker] Installing Service Worker... ", event);
     event.waitUntil(
@@ -124,20 +120,15 @@ self.addEventListener("fetch", (e) => {
         e.respondWith(
             fetch(e.request).then((res) => {
                 let clonedRes = res.clone();
-                clonedRes.json().then((data) => {
-                    for (let key in data) {
-                        dbPromise.then((db) => {
-                            //begin tx for store and choose operation
-                            let tx = db.transaction("posts", "readwrite");
-                            // get store from tx
-                            let store = tx.objectStore("posts");
-                            //put data in store
-                            store.put(data[key]);
-                            //complete tx, yes it is NOT a method
-                            return tx.complete;
-                        });
-                    }
-                });
+                clearAllData("posts")
+                    .then(() => {
+                        return clonedRes.json();
+                    })
+                    .then((data) => {
+                        for (let key in data) {
+                            writeData("posts", data[key]);
+                        }
+                    });
                 return res;
             })
         );
