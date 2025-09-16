@@ -213,3 +213,23 @@ self.addEventListener("sync", async (e) => {
         e.waitUntil(await performSyncing());
     }
 });
+
+self.addEventListener("notificationclick", (e) => {
+    let notif = e.notification;
+    let action = e.action;
+
+    console.log({ notif });
+
+    if (action === "confirm") {
+        console.log("confirm action clicked");
+        notif.close();
+    } else {
+        console.log("cancel action clicked: ", action);
+        notif.close();
+    }
+});
+
+self.addEventListener("notificationclose", (e) => {
+    //  for analytics purposes
+    console.log("notification was closed: ", e);
+});
