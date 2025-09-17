@@ -38,7 +38,7 @@
             "sizes": "512x512"
         }
     ],
-    "start_url": "/index.html",
+    "start_url": "/insta-pwa/index.html",
     "scope": ".",
     "display": "standalone",
     "orientation": "portrait-primary",
