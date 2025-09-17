@@ -1,8 +1,8 @@
 importScripts("/insta-pwa/src/js/idb.js");
 importScripts("/insta-pwa/src/js/utils.js");
 
-var CACHE_STATIC_NAME = "static-v4";
-var CACHE_DYNAMIC_NAME = "dynamic-v21";
+var CACHE_STATIC_NAME = "static-v5";
+var CACHE_DYNAMIC_NAME = "dynamic-v51";
 var STATIC_FILES = [
     "/insta-pwa/",
     "/insta-pwa/index.html",
