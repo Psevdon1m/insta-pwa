@@ -1,8 +1,8 @@
 importScripts("/insta-pwa/src/js/idb.js");
 importScripts("/insta-pwa/src/js/utils.js");
 
-var CACHE_STATIC_NAME = "static-v5";
-var CACHE_DYNAMIC_NAME = "dynamic-v51";
+var CACHE_STATIC_NAME = "static-v6";
+var CACHE_DYNAMIC_NAME = "dynamic-v61";
 var STATIC_FILES = [
     "/insta-pwa/",
     "/insta-pwa/index.html",
@@ -244,9 +244,9 @@ self.addEventListener("notificationclick", (e) => {
             clients.matchAll().then((clis) => {
                 let client = clis.find((c) => c.visibilityState === "visible");
                 if (client) {
-                    client.navigate("http://localhost:8080");
+                    client.navigate("https://psevdon1m.github.io/insta-pwa/");
                 } else {
-                    clients.openWindow("http://localhost:8080");
+                    clients.openWindow("https://psevdon1m.github.io/insta-pwa/");
                 }
             })
         );
