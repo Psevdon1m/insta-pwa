@@ -1,8 +1,8 @@
 importScripts("/src/js/idb.js");
 importScripts("/src/js/utils.js");
 
-var CACHE_STATIC_NAME = "static-v2";
-var CACHE_DYNAMIC_NAME = "dynamic-v11";
+var CACHE_STATIC_NAME = "static-v3";
+var CACHE_DYNAMIC_NAME = "dynamic-v31";
 var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src/js/idb.js", "/src/js/feed.js", "/src/js/material.min.js", "/src/css/app.css", "/src/css/feed.css", "/src/images/main-image.jpg", "https://fonts.googleapis.com/icon?family=Material+Icons", "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css", "https://fonts.googleapis.com/css?family=Roboto:400,700"];
 
 var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
@@ -233,4 +233,20 @@ self.addEventListener("notificationclick", (e) => {
 self.addEventListener("notificationclose", (e) => {
     //  for analytics purposes
     console.log("notification was closed: ", e);
+});
+
+self.addEventListener("push", (e) => {
+    console.log("Push notification received: ", e);
+    let data = { title: "New!", content: "Something new happened!" };
+    if (e.data) {
+        data = JSON.parse(e.data.text());
+    }
+
+    let options = {
+        body: data.content,
+        icon: "/src/images/icons/app-icon-96x96.png",
+        badge: "/src/images/icons/app-icon-96x96.png",
+    };
+
+    e.waitUntil(self.registration.showNotification(data.title, options));
 });
