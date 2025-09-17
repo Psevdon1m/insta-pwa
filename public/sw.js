@@ -1,9 +1,23 @@
-importScripts("/src/js/idb.js");
-importScripts("/src/js/utils.js");
+importScripts("/insta-pwa/src/js/idb.js");
+importScripts("/insta-pwa/src/js/utils.js");
 
 var CACHE_STATIC_NAME = "static-v3";
 var CACHE_DYNAMIC_NAME = "dynamic-v31";
-var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src/js/idb.js", "/src/js/feed.js", "/src/js/material.min.js", "/src/css/app.css", "/src/css/feed.css", "/src/images/main-image.jpg", "https://fonts.googleapis.com/icon?family=Material+Icons", "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css", "https://fonts.googleapis.com/css?family=Roboto:400,700"];
+var STATIC_FILES = [
+    "/insta-pwa/",
+    "/insta-pwa/index.html",
+    "/insta-pwa/offline.html",
+    "/insta-pwa/src/js/app.js",
+    "/insta-pwa/src/js/idb.js",
+    "/insta-pwa/src/js/feed.js",
+    "/insta-pwa/src/js/material.min.js",
+    "/insta-pwa/src/css/app.css",
+    "/insta-pwa/src/css/feed.css",
+    "/insta-pwa/src/images/main-image.jpg",
+    "https://fonts.googleapis.com/icon?family=Material+Icons",
+    "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css",
+    "https://fonts.googleapis.com/css?family=Roboto:400,700",
+];
 
 var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
 let local_backend_url = "http://localhost:3000/api/add-post";
