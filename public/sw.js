@@ -240,6 +240,16 @@ self.addEventListener("notificationclick", (e) => {
         notif.close();
     } else {
         console.log("cancel action clicked: ", action);
+        e.waitUntil(
+            clients.matchAll().then((clis) => {
+                let client = clis.find((c) => c.visibilityState === "visible");
+                if (client) {
+                    client.navigate("http://localhost:8080");
+                } else {
+                    clients.openWindow("http://localhost:8080");
+                }
+            })
+        );
         notif.close();
     }
 });
