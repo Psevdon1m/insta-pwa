@@ -88,7 +88,7 @@ function createCard(data) {
 }
 
 var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
-let local_backend_url = "https://37f1064aa42b.ngrok-free.app/api";
+let local_backend_url = "https://56195551ae88.ngrok-free.app/api";
 var networkDataReceived = false;
 
 function updateUI(data) {
