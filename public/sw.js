@@ -1,8 +1,8 @@
 importScripts("/insta-pwa/src/js/idb.js");
 importScripts("/insta-pwa/src/js/utils.js");
 
-var CACHE_STATIC_NAME = "static-v6";
-var CACHE_DYNAMIC_NAME = "dynamic-v61";
+var CACHE_STATIC_NAME = "static-v7";
+var CACHE_DYNAMIC_NAME = "dynamic-v71";
 var STATIC_FILES = [
     "/insta-pwa/",
     "/insta-pwa/index.html",
@@ -244,9 +244,9 @@ self.addEventListener("notificationclick", (e) => {
             clients.matchAll().then((clis) => {
                 let client = clis.find((c) => c.visibilityState === "visible");
                 if (client) {
-                    client.navigate("https://psevdon1m.github.io/insta-pwa/");
+                    client.navigate(notif.data.url);
                 } else {
-                    clients.openWindow("https://psevdon1m.github.io/insta-pwa/");
+                    clients.openWindow(notif.data.url);
                 }
             })
         );
@@ -261,7 +261,7 @@ self.addEventListener("notificationclose", (e) => {
 
 self.addEventListener("push", (e) => {
     console.log("Push notification received: ", e);
-    let data = { title: "New!", content: "Something new happened!" };
+    let data = { title: "New!", content: "Something new happened!", openUrl: "/" };
     if (e.data) {
         data = JSON.parse(e.data.text());
     }
@@ -270,6 +270,9 @@ self.addEventListener("push", (e) => {
         body: data.content,
         icon: "/src/images/icons/app-icon-96x96.png",
         badge: "/src/images/icons/app-icon-96x96.png",
+        data: {
+            url: data.openUrl,
+        },
     };
 
     e.waitUntil(self.registration.showNotification(data.title, options));

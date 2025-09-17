@@ -24,7 +24,7 @@ router.post("/api/add-post", async (req, res) => {
                 },
             };
             try {
-                webpush.sendNotification(pushConfig, JSON.stringify({ title: "New Post", content: "New Post Added!" }));
+                webpush.sendNotification(pushConfig, JSON.stringify({ title: "New Post", content: "New Post Added!", openUrl: "/help" }));
             } catch (error) {
                 console.log("Error sending pushes: ", error);
             }
