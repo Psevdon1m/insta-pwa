@@ -88,6 +88,7 @@ function createCard(data) {
 }
 
 var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
+let local_backend_url = "http://localhost:3000/api";
 var networkDataReceived = false;
 
 function updateUI(data) {
@@ -117,7 +118,7 @@ if ("indexedDB" in window) {
 }
 
 function sendData() {
-    fetch(url, {
+    fetch(local_backend_url + "/add-post", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

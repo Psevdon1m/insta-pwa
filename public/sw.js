@@ -5,6 +5,9 @@ var CACHE_STATIC_NAME = "static-v2";
 var CACHE_DYNAMIC_NAME = "dynamic-v11";
 var STATIC_FILES = ["/", "/index.html", "/offline.html", "/src/js/app.js", "/src/js/idb.js", "/src/js/feed.js", "/src/js/material.min.js", "/src/css/app.css", "/src/css/feed.css", "/src/images/main-image.jpg", "https://fonts.googleapis.com/icon?family=Material+Icons", "https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css", "https://fonts.googleapis.com/css?family=Roboto:400,700"];
 
+var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
+let local_backend_url = "http://localhost:3000/api/add-post";
+
 // function trimCache(cacheName, maxItems) {
 //     caches.open(cacheName).then((cache) => {
 //         return cache.keys().then((keys) => {
@@ -113,9 +116,7 @@ function isInArray(string, array) {
 // Cache, then network
 
 self.addEventListener("fetch", (e) => {
-    var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
-
-    if (e.request.url.indexOf(url) > -1) {
+    if (e.request.url.indexOf(local_backend_url) > -1) {
         //cache then network
         e.respondWith(
             fetch(e.request).then((res) => {
@@ -178,7 +179,7 @@ const performSyncing = async () => {
     }
     readAllData("sync").then((data) => {
         for (let d of data) {
-            fetch("https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json", {
+            fetch(local_backend_url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
