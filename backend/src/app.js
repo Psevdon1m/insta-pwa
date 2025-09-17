@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = ["https://psevdon1m.github.io/insta-pwa/", "http://127.0.0.1:8080", "http://localhost:3000", "http://localhost:3001"];
+const allowedOrigins = ["https://psevdon1m.github.io", "http://127.0.0.1:8080", "http://localhost:3000", "http://localhost:3001"];
 
 const corsOptions = {
     origin: function (origin, callback) {
