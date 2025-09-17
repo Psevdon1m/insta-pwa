@@ -4,7 +4,7 @@ const notificationButtons = document.querySelectorAll(".enable-notifications");
 
 if ("serviceWorker" in navigator) {
     //run code only if service worker is supported
-    navigator.serviceWorker.register("/sw.js").then(function () {
+    navigator.serviceWorker.register("../sw.js").then(function () {
         console.log("Service Worker Registered");
     });
 }
