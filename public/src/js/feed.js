@@ -43,6 +43,10 @@ captureButton.addEventListener("click", (e) => {
     console.log({ picture });
 });
 
+imagePicker.addEventListener("change", (e) => {
+    picture = e.target.files[0];
+});
+
 function openCreatePostModal() {
     // createPostArea.style.display = "block";
     createPostArea.style.transform = "translateY(0)";
