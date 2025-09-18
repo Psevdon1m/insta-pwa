@@ -39,6 +39,7 @@ captureButton.addEventListener("click", (e) => {
     ctx.drawImage(videoPlayer, 0, 0, canvasElement.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvasElement.width));
     videoPlayer.srcObj.getVideoTracks().forEach((track) => track.stop());
     picture = dataURItoBlob(canvasElement.toDataURL());
+    console.log({ picture });
 });
 
 function openCreatePostModal() {
