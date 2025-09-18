@@ -1,7 +1,7 @@
 importScripts("/insta-pwa/src/js/idb.js");
 importScripts("/insta-pwa/src/js/utils.js");
 
-var CACHE_STATIC_NAME = "static-v711";
+var CACHE_STATIC_NAME = "static-v7111";
 var CACHE_DYNAMIC_NAME = "dynamic-v711";
 var STATIC_FILES = [
     "/insta-pwa/",
@@ -20,7 +20,7 @@ var STATIC_FILES = [
 ];
 
 var url = "https://insta-pwa-490ec-default-rtdb.europe-west1.firebasedatabase.app/posts.json";
-let local_backend_url = "https://56195551ae88.ngrok-free.app/api/add-post";
+let local_backend_url = "https://5acb86c813d9.ngrok-free.app/api/add-post";
 
 // function trimCache(cacheName, maxItems) {
 //     caches.open(cacheName).then((cache) => {
