@@ -39,7 +39,7 @@ captureButton.addEventListener("click", (e) => {
     ctx.drawImage(videoPlayer, 0, 0, canvasElement.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvasElement.width));
 
     videoPlayer.srcObject.getVideoTracks().forEach((track) => track.stop());
-    picture = dataURItoBlob(canvasElement.toDataURI());
+    picture = dataURItoBlob(canvasElement.toDataURL());
     console.log({ picture });
 });
 
