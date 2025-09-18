@@ -12,6 +12,8 @@ var captureButton = document.querySelector("#capture-btn");
 var imagePicker = document.querySelector("#image-picker");
 var imagePickerArea = document.querySelector("#pick-image");
 
+let picture;
+
 function initializeMedia() {
     if ("mediaDevices" in navigator && "getUserMedia" in navigator.mediaDevices) {
         //check if video & audio supported
@@ -36,6 +38,7 @@ captureButton.addEventListener("click", (e) => {
     let ctx = canvasElement.getContext("2d");
     ctx.drawImage(videoPlayer, 0, 0, canvasElement.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvasElement.width));
     videoPlayer.srcObj.getVideoTracks().forEach((track) => track.stop());
+    picture = dataURItoBlob(canvasElement.toDataURL());
 });
 
 function openCreatePostModal() {
@@ -155,18 +158,16 @@ if ("indexedDB" in window) {
 }
 
 function sendData() {
+    const id = new Date().toISOString();
+    const postData = new FormData();
+    postData.append("id", id);
+    postData.append("title", titleInput.value);
+    postData.append("location", locationInput.value);
+    postData.append("file", picture, id + ".png");
     fetch(local_backend_url + "/add-post", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        },
-        body: JSON.stringify({
-            title: titleInput.value,
-            location: locationInput.value,
-            id: new Date().toISOString(),
-            image: "https://www.ukrainer.net/wp-content/uploads/2019/12/15.jpg",
-        }),
+
+        body: postData,
     }).then((res) => {
         console.log("Data sent: ", res);
         updateUI();
@@ -189,6 +190,7 @@ from.addEventListener("submit", (e) => {
                 title: titleInput.value,
                 location: locationInput.value,
                 id: new Date().toISOString(),
+                picture: picture,
             };
 
             //in brawe and other browsers bg sync is disabled by default, so we need to check and inform user

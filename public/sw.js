@@ -193,18 +193,15 @@ const performSyncing = async () => {
     }
     readAllData("sync").then((data) => {
         for (let d of data) {
+            const postData = new FormData();
+            postData.append("id", d.id);
+            postData.append("title", d.title);
+            postData.append("location", d.location);
+            postData.append("file", d.picture, d.id + ".png");
             fetch(local_backend_url, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    title: d.title,
-                    location: d.location,
-                    id: d.id,
-                    image: d.image,
-                }),
+
+                body: postData,
             })
                 .then((res) => {
                     console.log("Data sent: ", res);
