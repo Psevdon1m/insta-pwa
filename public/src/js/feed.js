@@ -6,8 +6,32 @@ var from = document.querySelector("form");
 var titleInput = document.querySelector("#title");
 var locationInput = document.querySelector("#location");
 
+var videoPlayer = document.querySelector("#player");
+var canvasElement = document.querySelector("#canvas");
+var captureButton = document.querySelector("#capture-btn");
+var imagePicker = document.querySelector("#image-picker");
+var imagePickerArea = document.querySelector("#pick-image");
+
+function initializeMedia() {
+    if ("mediaDevices" in navigator && "getUserMedia" in navigator.mediaDevices) {
+        //check if video & audio supported
+        navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then((stream) => {
+                videoPlayer.srcObject = stream;
+                videoPlayer.style.display = "block";
+            })
+            .catch((err) => {
+                imagePickerArea.style.display = "block";
+                console.log("No access to media: ", err);
+            });
+    }
+}
+
 function openCreatePostModal() {
-    createPostArea.style.display = "block";
+    // createPostArea.style.display = "block";
+    createPostArea.style.transform = "translateY(0)";
+    initializeMedia();
     if (deferredPrompt) {
         deferredPrompt.prompt();
 
@@ -35,6 +59,9 @@ function openCreatePostModal() {
 
 function closeCreatePostModal() {
     createPostArea.style.display = "none";
+    imagePickerArea.style.display = "none";
+    videoPlayer.style.display = "none";
+    canvasElement.style.display = "none";
 }
 
 shareImageButton.addEventListener("click", openCreatePostModal);
