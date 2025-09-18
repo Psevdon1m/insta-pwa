@@ -28,6 +28,16 @@ function initializeMedia() {
     }
 }
 
+captureButton.addEventListener("click", (e) => {
+    canvasElement.style.display = "block";
+    videoPlayer.style.display = "none";
+    captureButton.style.display = "none";
+
+    let ctx = canvasElement.getContext("2d");
+    ctx.drawImage(videoPlayer, 0, 0, canvas.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvas.width));
+    videoPlayer.srcObj.getVideoTracks().forEach((track) => track.stop());
+});
+
 function openCreatePostModal() {
     // createPostArea.style.display = "block";
     createPostArea.style.transform = "translateY(0)";
