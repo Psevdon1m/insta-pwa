@@ -37,6 +37,8 @@ captureButton.addEventListener("click", (e) => {
 
     let ctx = canvasElement.getContext("2d");
     ctx.drawImage(videoPlayer, 0, 0, canvasElement.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvasElement.width));
+    console.log({ videoPlayer });
+
     videoPlayer.srcObj.getVideoTracks().forEach((track) => track.stop());
     picture = dataURItoBlob(canvasElement.toDataURL());
     console.log({ picture });
