@@ -34,7 +34,7 @@ captureButton.addEventListener("click", (e) => {
     captureButton.style.display = "none";
 
     let ctx = canvasElement.getContext("2d");
-    ctx.drawImage(videoPlayer, 0, 0, canvas.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvas.width));
+    ctx.drawImage(videoPlayer, 0, 0, canvasElement.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvasElement.width));
     videoPlayer.srcObj.getVideoTracks().forEach((track) => track.stop());
 });
 
