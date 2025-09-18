@@ -16,7 +16,16 @@ export async function processUpload(req) {
     await ensureImagesDirectoryExists();
 
     return new Promise((resolve, reject) => {
-        const form = formidable({ multiples: false, keepExtensions: true });
+        const form = formidable({
+            multiples: false,
+            keepExtensions: true,
+            uploadDir: imagesDirectory,
+            filename: (name, ext, part, form) => {
+                const extension = ext || path.extname(name || "");
+                const uniqueName = `${Date.now()}_${Math.random().toString(36).slice(2)}${extension}`;
+                return uniqueName;
+            },
+        });
 
         form.parse(req, async (err, fields, files) => {
             if (err) {
@@ -24,26 +33,29 @@ export async function processUpload(req) {
             }
 
             try {
-                const fileCandidate = files.file || files.image || Object.values(files || {})[0];
+                let fileCandidate = files.file || files.image || Object.values(files || {})[0];
+                if (Array.isArray(fileCandidate)) {
+                    fileCandidate = fileCandidate[0];
+                }
 
                 if (!fileCandidate) {
                     return resolve({ fields, image: null });
                 }
 
-                const tempFilePath = fileCandidate.filepath || fileCandidate.path;
-                const originalName = fileCandidate.originalFilename || fileCandidate.name || "upload";
-                const extension = path.extname(originalName);
-                const uniqueName = `${Date.now()}_${Math.random().toString(36).slice(2)}${extension}`;
-                const destinationPath = path.join(imagesDirectory, uniqueName);
+                const storedPath = fileCandidate.filepath || fileCandidate.path;
+                const filename = path.basename(storedPath);
+                const destinationPath = path.join(imagesDirectory, filename);
 
-                await fs.promises.copyFile(tempFilePath, destinationPath);
+                if (!storedPath) {
+                    return reject(new TypeError("Upload did not produce a stored file path"));
+                }
 
                 resolve({
                     fields,
                     image: {
-                        filename: uniqueName,
+                        filename,
                         path: destinationPath,
-                        url: `/images/${uniqueName}`,
+                        url: `https://5acb86c813d9.ngrok-free.app/images/${filename}`,
                     },
                 });
             } catch (copyErr) {

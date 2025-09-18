@@ -39,7 +39,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // serve images statically
-app.use("/images", express.static(path.resolve(__dirname, "..", "images")));
+app.use(
+    "/images",
+    (req, res, next) => {
+        res.setHeader("ngrok-skip-browser-warning", "true");
+        res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+        next();
+    },
+    express.static(path.resolve(__dirname, "..", "images"))
+);
 
 //add routes
 app.use(addPostRouter);
